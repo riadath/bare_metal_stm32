@@ -13,3 +13,4 @@ out.elf: main.o stm32_startup.o
 
 clean:
 	del *.o, *.elf
+

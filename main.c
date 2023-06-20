@@ -5,6 +5,12 @@
 #include <stdbool.h>
 
 int main(){
+  bool flag = true;
+  if (flag){
+    // something
+  }else{
+    // something else
+  }
 
   return 0;
 }
