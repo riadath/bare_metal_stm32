@@ -1,31 +1,31 @@
-/*Linker Script for STM32F446RE*/
-
 ENTRY(Reset_Handler)
-MEMORY{
-  FLASH(rx) : ORIGIN =0x08000000, LENGTH =512K
-  SRAM(rwx) : ORIGIN =0x20000000, LENGTH =128K
+MEMORY
+{
+	FLASH(RX): ORIGIN = 0x08000000, LENGTH = 512K
+	SRAM(RWX): ORIGIN = 0x20000000, LENGTH = 128K /* combined both SRAM1 and SRAM2 */
 }
-
-/*Section Definitions*/
-SECTIONS{
-  .text : {
-    _stext = .;
-    *(.isr_vector)
-    *(.text)
-    *(.rodata)
-    _etext = .;
-  } >FLASH
-  
-  .data : {
-    _sdata = .;
-    *(.data)
-    _edata = .;
-  } > SRAM AT> FLASH
-  
-  .bss : {
-    _sbss = .;
-    *(.bss)
-    _ebss = .;
-  } >SRAM
-
+SECTIONS
+{
+	.text :
+	{	_stext = .;
+		*(.isr_vector)
+		*(.text) 
+		*(.rodata)
+		. = ALIGN(4);
+		_etext = .;
+	}> FLASH AT> FLASH 
+	_la_data = LOADADDR(.data);
+	.data :
+	{
+		_sdata = .;
+		*(.data)
+		. = ALIGN(4);
+		_edata = .;
+	}>SRAM AT> FLASH
+	.bss :
+	{
+		_sbss = .;
+		*(.bss)
+		_ebss = .; 
+	}>SRAM
 }

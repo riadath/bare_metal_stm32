@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "_default_types.h": "c",
+        "stdbool.h": "c"
+    }
+}
