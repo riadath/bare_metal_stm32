@@ -1,7 +1,4 @@
-#include <stdio.h>
 #include <stdint.h>
-#include <string.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 
@@ -16,15 +13,8 @@ typedef struct {
   volatile uint32_t LCKR;
   volatile uint32_t AFRL[2];
 }GPIO_STRUCT;
-/*
-  n = 0, for GPIOA
-  n = 1, for GPIOB
-  ....
-  n = 7, for GPIOH
-*/
+
 #define GPIO(n) ((GPIO_STRUCT*) (0x40020000 + (n * 0x400)))
-
-
 
 typedef struct{
   uint32_t volatile CR; /* Offset: 0x00 (R/W) Clock Control Register */
@@ -67,20 +57,32 @@ typedef struct{
 #define RCC ((RCC_t *)0x40023800)
 #define GPIOA_OFFSET 0x0;
 
+enum GPIOx{GPIOA,GPIOB,GPIOC,GPIOD,GPIOE,GPIOF,GPIOG,GPIOH};
+enum PIN_STATE{GPIO_PIN_RESET,GPIO_PIN_SET};
+enum GPIO_MODE{INPUT,OUTPUT,ALTERNATE,ANALOG};
 
-static inline void GPIO_Init(uint8_t gpio_no, uint8_t pin,uint8_t mode)
+static inline void GPIO_Init(enum GPIOx gpiox, uint8_t pin,enum GPIO_MODE mode)
 {
-  GPIO_STRUCT* gpio = GPIO(gpio_no);
+  GPIO_STRUCT* gpio = GPIO(gpiox);
   gpio->MODER &= ~(3U << (pin * 2));
   gpio->MODER |= ((mode) << (pin * 2));
 }
 
-static inline void GPIO_WritePin(uint8_t gpio_no,uint8_t pin,bool state){
-  GPIO_STRUCT *gpio = GPIO(gpio_no);
-  if(state == true){
+static inline void GPIO_WritePin(enum GPIOx gpiox,uint8_t pin,enum PIN_STATE state){
+  GPIO_STRUCT *gpio = GPIO(gpiox);
+  if(state == GPIO_PIN_SET){
     gpio->BSRR |= (0x1U << pin);
-  }else{
+  }else if (state == GPIO_PIN_RESET){
     gpio->BSRR |= (0x1U << (pin + 16));
+  }
+}
+
+static inline bool GPIO_InputStatus(enum GPIOx gpiox,uint8_t pin){
+  GPIO_STRUCT *gpio = GPIO(gpiox);
+  if(gpio->IDR & (1U << pin)){
+    return true;
+  }else{
+    return false;
   }
 }
 
@@ -94,20 +96,15 @@ int main()
   RCC_t* rcc = RCC;
   rcc->AHB1ENR |= 1 << GPIOA_OFFSET;
 
-  GPIO_Init(0,5,1);
-  GPIO_Init(0,6,1);
-  GPIO_Init(0,7,1);
-
+  GPIO_Init(GPIOA,1,OUTPUT); // initialize gpio pin 5 in output mode.
+  GPIO_Init(GPIOA,4,INPUT); // initialize gpio pin 6 in input mode.
+  
   while(1){
-    GPIO_WritePin(0,5,true);
-    GPIO_WritePin(0,6,true);
-
-    shitty_delay(999999);
-
-    GPIO_WritePin(0,5,false);
-    GPIO_WritePin(0,6,false);
-
-    shitty_delay(999999);
+    if(GPIO_InputStatus(GPIOA,4)){
+      GPIO_WritePin(GPIOA,1,GPIO_PIN_SET);
+    }else{
+      GPIO_WritePin(GPIOA,1,GPIO_PIN_RESET);
+    }
   }
   
   return 0;
