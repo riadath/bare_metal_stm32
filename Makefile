@@ -5,7 +5,7 @@ LDFLAGS = -nostdlib -T linker.ld -Wl,-Map=out.map
 
 
 all:main.o stm32_startup.o out.elf
-clean_build: clean all	
+	
 main.o:main.c
 	$(CC) $(CFLAGS) $^ -o $@
 stm32_startup.o:stm32_startup.c
@@ -19,5 +19,10 @@ clean:
 
 load:
 	openocd -f board/st_nucleo_f4.cfg
+
+# automating the build and load process
+clean_build: clean all
 gdb:
 	arm-none-eabi-gdb -x init.gdb
+
+build_load:clean_build gdb
