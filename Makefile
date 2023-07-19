@@ -4,7 +4,9 @@ CFLAGS = -c -mcpu=$(CPU) -mthumb -std=gnu11 -Wall -O0
 LDFLAGS = -nostdlib -T linker.ld -Wl,-Map=target/out.map
 OBJECT = object_files
 TARGET = target
-all:main.o stm32_startup.o gpio.o out.elf
+
+
+all:main.o stm32_startup.o gpio.o clock.o out.elf
 	
 	
 main.o:main.c
@@ -13,10 +15,13 @@ stm32_startup.o:stm32_startup.c
 	$(CC) $(CFLAGS) $^ -o $(OBJECT)/$@
 gpio.o:gpio.c
 	$(CC) $(CFLAGS) $^ -o $(OBJECT)/$@
+clock.o:clock.c
+	$(CC) $(CFLAGS) $^ -o $(OBJECT)/$@
 
 
-out.elf: $(OBJECT)/main.o $(OBJECT)/stm32_startup.o $(OBJECT)/gpio.o
+out.elf: $(OBJECT)/main.o $(OBJECT)/stm32_startup.o $(OBJECT)/gpio.o $(OBJECT)/clock.o
 	$(CC) $(LDFLAGS) $^ -o $(TARGET)/$@
+
 
 clean:
 	rm -rf $(OBJECT)/*.o $(TARGET)/*.elf $(TARGET)/*.map
@@ -24,6 +29,7 @@ clean:
 
 load:
 	openocd -f board/st_nucleo_f4.cfg
+
 
 # automating the build and load process
 clean_build: clean all
