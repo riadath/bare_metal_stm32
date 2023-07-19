@@ -100,6 +100,7 @@ int main()
   GPIO_Init(GPIOA,4,INPUT); // initialize gpio pin 6 in input mode.
   
   while(1){
+    // GPIO_WritePin(GPIOA,1,GPIO_PIN_SET);
     if(GPIO_InputStatus(GPIOA,4)){
       GPIO_WritePin(GPIOA,1,GPIO_PIN_SET);
     }else{
