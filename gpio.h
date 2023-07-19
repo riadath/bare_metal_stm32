@@ -64,8 +64,8 @@ enum PIN_STATE{GPIO_PIN_RESET,GPIO_PIN_SET};
 enum GPIO_MODE{INPUT,OUTPUT,ALTERNATE,ANALOG};
 
 
-static inline void GPIO_Init(enum GPIOx gpiox, uint8_t pin,enum GPIO_MODE mode);
-static inline bool GPIO_InputStatus(enum GPIOx gpiox,uint8_t pin);
-static inline void shitty_delay(volatile uint32_t count);
+void GPIO_Init(enum GPIOx gpiox, uint8_t pin,enum GPIO_MODE mode);
+void GPIO_WritePin(enum GPIOx gpiox,uint8_t pin,enum PIN_STATE state);
+bool GPIO_InputStatus(enum GPIOx gpiox,uint8_t pin);
 
 #endif
