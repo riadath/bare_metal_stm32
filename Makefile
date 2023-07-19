@@ -1,20 +1,25 @@
 CC = arm-none-eabi-gcc
 CPU = cortex-m4
 CFLAGS = -c -mcpu=$(CPU) -mthumb -std=gnu11 -Wall -O0
-LDFLAGS = -nostdlib -T linker.ld -Wl,-Map=out.map
-
-
-all:main.o stm32_startup.o out.elf
+LDFLAGS = -nostdlib -T linker.ld -Wl,-Map=target/out.map
+OBJECT = object_files
+TARGET = target
+all:main.o stm32_startup.o gpio.o out.elf
+	
 	
 main.o:main.c
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $(OBJECT)/$@
 stm32_startup.o:stm32_startup.c
-	$(CC) $(CFLAGS) $^ -o $@
-out.elf: main.o stm32_startup.o
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $(OBJECT)/$@
+gpio.o:gpio.c
+	$(CC) $(CFLAGS) $^ -o $(OBJECT)/$@
+
+
+out.elf: $(OBJECT)/main.o $(OBJECT)/stm32_startup.o $(OBJECT)/gpio.o
+	$(CC) $(LDFLAGS) $^ -o $(TARGET)/$@
 
 clean:
-	del *.o, *.elf, *.map
+	rm -rf $(OBJECT)/*.o $(TARGET)/*.elf $(TARGET)/*.map
 
 
 load:
